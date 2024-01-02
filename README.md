@@ -1,6 +1,6 @@
 # Basic Webserver
 
-Basic REST API for boulding and handling a HTTP CRUD requests.
+REST API for bulding and handling HTTP CRUD requests.
 
 - chi router
 - middleware
