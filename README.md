@@ -1,7 +1,7 @@
-# Orders API Webserver
+# Orders API Webserver with go and chi
 
 API microservice for handling HTTP CRUD requests.
 
-- chi router/middleware framework
+- chi router and middleware
 - redis database
-- signint (signal interrupt)
+- Graceful shutdown. signint (signal interrupt)
