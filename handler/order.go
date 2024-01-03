@@ -20,8 +20,8 @@ type Order struct {
 	Repo *order.RedisRepo
 }
 
+// Create an order
 func (h *Order) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Create an order")
 	var body struct {
 		CustomerID uuid.UUID        `json:"customer_id"`
 		LineItems  []model.LineItem `json:"line_items"`
@@ -59,8 +59,8 @@ func (h *Order) Create(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// Get all orders
 func (h *Order) List(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Get all orders")
 	cursorStr := r.URL.Query().Get("cursor")
 	if cursorStr == "" {
 		cursorStr = "0"
@@ -87,7 +87,7 @@ func (h *Order) List(w http.ResponseWriter, r *http.Request) {
 
 	var response struct {
 		Items []model.Order `json:"items"`
-		Next  uint64        `json:"next,omitempty`
+		Next  uint64        `json:"next,omitempty"`
 	}
 	response.Items = res.Orders
 	response.Next = res.Cursor
@@ -101,8 +101,8 @@ func (h *Order) List(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// Get an order by ID
 func (h *Order) GetByID(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Get an order by ID")
 	idParam := chi.URLParam(r, "id")
 
 	const base = 10
@@ -130,8 +130,8 @@ func (h *Order) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Update status order by ID
 func (h *Order) UpdateByID(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Update an order by ID")
 	var body struct {
 		Status string `json:"status"`
 	}
@@ -199,8 +199,8 @@ func (h *Order) UpdateByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Delete an order by ID
 func (h *Order) DeleteByID(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Delete an order by ID")
 	idParam := chi.URLParam(r, "id")
 
 	const base = 10
