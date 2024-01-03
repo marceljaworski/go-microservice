@@ -38,6 +38,11 @@ func (r *RedisRepo) Insert(ctx context.Context, order model.Order) error {
 		txn.Discard()
 		return fmt.Errorf("failed to add to orders set: %w", err)
 	}
+
+	if _, err := txn.Exec(ctx); err != nil {
+		return fmt.Errorf("failed to exec: %w", err)
+	}
+
 	return nil
 }
 
@@ -65,11 +70,24 @@ func (r *RedisRepo) FindByID(ctx context.Context, id uint64) (model.Order, error
 func (r *RedisRepo) DeleteByID(ctx context.Context, id uint64) error {
 	key := orderIDKey(id)
 
-	err := r.Client.Del(ctx, key).Err()
+	txn := r.Client.TxPipeline()
+
+	err := txn.Del(ctx, key).Err()
 	if errors.Is(err, redis.Nil) {
+		txn.Discard()
 		return ErrNotExist
 	} else if err != nil {
+		txn.Discard()
 		return fmt.Errorf("get order: %w", err)
+	}
+
+	if err := txn.SRem(ctx, "orders", key).Err(); err != nil {
+		txn.Discard()
+		return fmt.Errorf("failed to remove from orders set: %w", err)
+	}
+
+	if _, err := txn.Exec(ctx); err != nil {
+		return fmt.Errorf("failed to exec: %w", err)
 	}
 
 	return nil
