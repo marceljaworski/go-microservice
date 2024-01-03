@@ -1,8 +1,7 @@
-# Basic Webserver
+# Orders API Webserver
 
-REST API for bulding and handling HTTP CRUD requests.
+API microservice for handling HTTP CRUD requests.
 
-- chi router
-- middleware
-- redis
+- chi router/middleware framework
+- redis database
 - signint (signal interrupt)
