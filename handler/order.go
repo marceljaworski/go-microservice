@@ -16,8 +16,16 @@ import (
 	"github.com/marceljaworski/go-microservice/repository/order"
 )
 
+//	type Repo interface {
+//		Insert(ctx context.Context, order Order) error
+//		FindByID(ctx context.Context, id uint64) (Order, error)
+//		DeleteByID(ctx context.Context, id uint64) error
+//		Update(ctx context.Context, order Order) error
+//		FindAll(ctx context.Context, page order.FindAllPage) (FindResult, error)
+//	}
 type Order struct {
 	Repo *order.RedisRepo
+	// Repo Repo
 }
 
 // Create an order
