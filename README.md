@@ -5,3 +5,4 @@ API microservice for handling HTTP CRUD requests.
 - chi router and middleware
 - redis database
 - Graceful shutdown. signint (signal interrupt)
+- godotenv
