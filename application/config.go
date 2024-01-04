@@ -1,8 +1,11 @@
 package application
 
 import (
+	"log"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -11,8 +14,16 @@ type Config struct {
 }
 
 func LoadConfig() Config {
+	// load env variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	RedisAddress := os.Getenv("REDIS_ADDR")
+
 	cfg := Config{
-		RedisAddress: "localhost:6379",
+		RedisAddress: RedisAddress,
 		ServerPort:   3000,
 	}
 
