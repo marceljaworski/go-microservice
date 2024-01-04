@@ -17,11 +17,12 @@ func LoadConfig() Config {
 	// load env variables
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatalf("Error loading .env file. Err: %s", err)
 	}
 
 	RedisAddress := os.Getenv("REDIS_ADDR")
 
+	// set the config object
 	cfg := Config{
 		RedisAddress: RedisAddress,
 		ServerPort:   3000,
