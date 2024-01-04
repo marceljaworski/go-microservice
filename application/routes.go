@@ -7,7 +7,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/marceljaworski/go-microservice/handler"
-	"github.com/marceljaworski/go-microservice/repository/order"
+	"github.com/marceljaworski/go-microservice/repository"
 )
 
 func (a *App) loadRoutes() {
@@ -26,7 +26,7 @@ func (a *App) loadRoutes() {
 
 func (a *App) loadOrderRoutes(router chi.Router) {
 	orderHandler := &handler.Order{
-		Repo: &order.RedisRepo{
+		Repo: &repository.RedisRepo{
 			Client: a.rdb,
 		},
 	}

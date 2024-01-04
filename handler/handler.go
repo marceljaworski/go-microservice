@@ -11,9 +11,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-
 	"github.com/marceljaworski/go-microservice/model"
-	"github.com/marceljaworski/go-microservice/repository/order"
+	"github.com/marceljaworski/go-microservice/repository"
 )
 
 //	type Repo interface {
@@ -21,10 +20,10 @@ import (
 //		FindByID(ctx context.Context, id uint64) (Order, error)
 //		DeleteByID(ctx context.Context, id uint64) error
 //		Update(ctx context.Context, order Order) error
-//		FindAll(ctx context.Context, page order.FindAllPage) (FindResult, error)
+//		FindAll(ctx context.Context, page FindAllPage) (FindResult, error)
 //	}
 type Order struct {
-	Repo *order.RedisRepo
+	Repo *repository.RedisRepo
 	// Repo Repo
 }
 
@@ -83,7 +82,7 @@ func (h *Order) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	const size = 50
-	res, err := h.Repo.FindAll(r.Context(), order.FindAllPage{
+	res, err := h.Repo.FindAll(r.Context(), repository.FindAllPage{
 		Offset: cursor,
 		Size:   size,
 	})
@@ -122,7 +121,7 @@ func (h *Order) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	o, err := h.Repo.FindByID(r.Context(), orderID)
-	if errors.Is(err, order.ErrNotExist) {
+	if errors.Is(err, repository.ErrNotExist) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -161,7 +160,7 @@ func (h *Order) UpdateByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	theOrder, err := h.Repo.FindByID(r.Context(), orderID)
-	if errors.Is(err, order.ErrNotExist) {
+	if errors.Is(err, repository.ErrNotExist) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -220,7 +219,7 @@ func (h *Order) DeleteByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = h.Repo.DeleteByID(r.Context(), orderID)
-	if errors.Is(err, order.ErrNotExist) {
+	if errors.Is(err, repository.ErrNotExist) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	} else if err != nil {
