@@ -2,16 +2,20 @@ package application
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/cenkalti/backoff"
+	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 )
 
 type App struct {
 	router http.Handler
 	rdb    *redis.Client
+	db     *sql.DB
 	config Config
 }
 
@@ -33,8 +37,16 @@ func (a *App) Start(ctx context.Context) error {
 		Addr:    fmt.Sprintf(":%d", a.config.ServerPort),
 		Handler: a.router,
 	}
+	var err error
 
-	err := a.rdb.Ping(ctx).Err()
+	a.db, err = initStore(a)
+	if err != nil {
+		return fmt.Errorf("failed to initialise the store: %s", err)
+	}
+	defer a.db.Close()
+
+	// Redis
+	err = a.rdb.Ping(ctx).Err()
 	if err != nil {
 		return fmt.Errorf("failed to connect to redis: %w", err)
 	}
@@ -67,4 +79,41 @@ func (a *App) Start(ctx context.Context) error {
 		return server.Shutdown(timeout)
 	}
 
+}
+
+// postgress values variables
+const (
+	host   = "localhost"
+	port   = 5432
+	user   = "postgres"
+	dbname = "orders"
+)
+
+func initStore(a *App) (*sql.DB, error) {
+	// Postgres connection string
+	psqlConnString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host,
+		port,
+		user,
+		a.config.Password,
+		dbname,
+	)
+	var err error
+
+	openDB := func() error {
+		a.db, err = sql.Open("postgres", psqlConnString)
+		return err
+	}
+
+	err = backoff.Retry(openDB, backoff.NewExponentialBackOff())
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := a.db.Exec(
+		"CREATE TABLE IF NOT EXISTS message (value TEXT PRIMARY KEY)"); err != nil {
+		return nil, err
+	}
+
+	return a.db, nil
 }

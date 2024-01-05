@@ -11,6 +11,7 @@ import (
 type Config struct {
 	RedisAddress string
 	ServerPort   uint16
+	Password     string
 }
 
 func LoadConfig() Config {
@@ -20,12 +21,14 @@ func LoadConfig() Config {
 		log.Fatalf("Error loading .env file. Err: %s", err)
 	}
 
-	RedisAddress := os.Getenv("REDIS_ADDR")
+	redisAddress := os.Getenv("REDIS_ADDR")
+	password := os.Getenv("PASSWORD")
 
 	// set the config object
 	cfg := Config{
-		RedisAddress: RedisAddress,
+		RedisAddress: redisAddress,
 		ServerPort:   3000,
+		Password:     password,
 	}
 
 	if redisAddr, exists := os.LookupEnv("REDIS_ADDR"); exists {
