@@ -44,6 +44,7 @@ func (a *App) Start(ctx context.Context) error {
 		return fmt.Errorf("failed to initialise the store: %s", err)
 	}
 	defer a.db.Close()
+	fmt.Println("psql DB conected")
 
 	// Redis
 	err = a.rdb.Ping(ctx).Err()
