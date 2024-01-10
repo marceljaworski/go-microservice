@@ -24,6 +24,7 @@ func New(config Config) *App {
 		rdb: redis.NewClient(&redis.Options{
 			Addr: config.RedisAddress,
 		}),
+		db:     &sql.DB{},
 		config: config,
 	}
 
@@ -39,6 +40,7 @@ func (a *App) Start(ctx context.Context) error {
 	}
 	var err error
 
+	// Postgres
 	a.db, err = initStore(a)
 	if err != nil {
 		return fmt.Errorf("failed to initialise the store: %s", err)
@@ -85,7 +87,7 @@ func (a *App) Start(ctx context.Context) error {
 // postgress values variables
 const (
 	host   = "localhost"
-	port   = 5432
+	port   = 5434
 	user   = "postgres"
 	dbname = "orders"
 )
@@ -110,9 +112,23 @@ func initStore(a *App) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	if _, err := a.db.Exec(
-		"CREATE TABLE IF NOT EXISTS message (value TEXT PRIMARY KEY)"); err != nil {
+		`CREATE TABLE [IF NOT EXISTS] lineItem (
+			item_id INT PRIMARY KEY,
+			quantity INT,
+			price INT,
+			)`); err != nil {
+		return nil, err
+	}
+	if _, err := a.db.Exec(
+		`CREATE TABLE [IF NOT EXISTS] orders (
+			order_id INT PRIMARY KEY,
+			customer_id INT,
+			line_items INT[][] REFERENCES lineItem(item_id),
+			CreatedAt TIMESTAMP,
+			ShippedAt TIMESTAMP,
+			CompletedAt TIMESTAMP
+			)`); err != nil {
 		return nil, err
 	}
 

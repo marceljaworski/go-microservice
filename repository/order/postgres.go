@@ -2,146 +2,53 @@ package order
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/marceljaworski/go-microservice/model"
 )
 
 type PostgresRepo struct {
-	Repo Repo
+	db *sql.DB
 }
 
-// func (r PostgresRepo) Insert(ctx context.Context, order model.Order) error {
-// 	data, err := json.Marshal(order)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to encode order: %w", err)
-// 	}
+func (r PostgresRepo) Insert(ctx context.Context, order model.Order) error {
+	data, err := json.Marshal(order)
+	if err != nil {
+		return fmt.Errorf("failed to encode order: %w", err)
+	}
+	fmt.Println("data----->", data)
+	key := orderIDKey(order.OrderID)
 
-// 	key := orderIDKey(order.OrderID)
+	_, err = r.db.Exec("INSERT INTO  orders(order_id,customer_id,created_at) VALUES($1,$2,$3)", key, order.CustomerID, order.CreatedAt)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("value inserted")
+	}
 
-// txn := r.Repo.TxPipeline()
+	return nil
+}
 
-// res := txn.SetNX(ctx, key, string(data), 0)
-// if err := res.Err(); err != nil {
-// 	txn.Discard()
-// 	return fmt.Errorf("failed to set: %w", err)
-// }
+func (r *PostgresRepo) FindByID(ctx context.Context, id uint64) error {
 
-// if err := txn.SAdd(ctx, "orders", key).Err(); err != nil {
-// 	txn.Discard()
-// 	return fmt.Errorf("failed to add to orders set: %w", err)
-// }
+	return nil
+}
 
-// if _, err := txn.Exec(ctx); err != nil {
-// 	return fmt.Errorf("failed to exec: %w", err)
-// }
+func (r *PostgresRepo) DeleteByID(ctx context.Context, id uint64) error {
 
-// 	return nil
-// }
+	return nil
+}
 
-// func (r *PostgresRepo) FindByID(ctx context.Context, id uint64) (model.Order, error) {
-// 	key := orderIDKey(id)
+func (r *PostgresRepo) Update(ctx context.Context, order model.Order) error {
 
-// 	value, err := r.Repo.Get(ctx, key).Result()
-// 	if errors.Is(err, redis.Nil) {
-// 		return model.Order{}, ErrNotExist
-// 	} else if err != nil {
-// 		return model.Order{}, fmt.Errorf("get order: %w", err)
-// 	}
-
-// 	var order model.Order
-// 	err = json.Unmarshal([]byte(value), &order)
-// 	if err != nil {
-// 		return model.Order{}, fmt.Errorf("failed to decode order json: %w", err)
-// 	}
-
-// 	return order, nil
-// }
-
-// func (r *PostgresRepo) DeleteByID(ctx context.Context, id uint64) error {
-// 	key := orderIDKey(id)
-
-// 	txn := r.Client.TxPipeline()
-
-// 	err := txn.Del(ctx, key).Err()
-// 	if errors.Is(err, redis.Nil) {
-// 		txn.Discard()
-// 		return ErrNotExist
-// 	} else if err != nil {
-// 		txn.Discard()
-// 		return fmt.Errorf("get order: %w", err)
-// 	}
-
-// 	if err := txn.SRem(ctx, "orders", key).Err(); err != nil {
-// 		txn.Discard()
-// 		return fmt.Errorf("failed to remove from orders set: %w", err)
-// 	}
-
-// 	if _, err := txn.Exec(ctx); err != nil {
-// 		return fmt.Errorf("failed to exec: %w", err)
-// 	}
-
-// 	return nil
-// }
-
-// func (r *PostgresRepo) Update(ctx context.Context, order model.Order) error {
-// 	data, err := json.Marshal(order)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to encode order: %w", err)
-// 	}
-
-// 	key := orderIDKey(order.OrderID)
-
-// 	err = r.Client.SetXX(ctx, key, string(data), 0).Err()
-// 	if errors.Is(err, redis.Nil) {
-// 		return ErrNotExist
-// 	} else if err != nil {
-// 		return fmt.Errorf("get order: %w", err)
-// 	}
-
-// 	return nil
-// }
+	return nil
+}
 
 func (r PostgresRepo) FindAll(ctx context.Context, page FindAllPage) (FindResult, error) {
 
 	fmt.Println("Hello, Docker!")
-	return FindResult{
-		Orders: []model.Order{},
-	}, nil
-	// res := r.Client.SScan(ctx, "orders", page.Offset, "*", int64(page.Size))
 
-	// keys, cursor, err := res.Result()
-	// if err != nil {
-	// 	return FindResult{}, fmt.Errorf("failed to get order ids: %w", err)
-	// }
-
-	// if len(keys) == 0 {
-	// 	return FindResult{
-	// 		Orders: []model.Order{},
-	// 	}, nil
-	// }
-
-	// xs, err := r.Client.MGet(ctx, keys...).Result()
-	// if err != nil {
-	// 	return FindResult{}, fmt.Errorf("failed to get orders: %w", err)
-	// }
-
-	// orders := make([]model.Order, len(xs))
-
-	// for i, x := range xs {
-	// 	x := x.(string)
-	// 	var order model.Order
-
-	// 	err := json.Unmarshal([]byte(x), &order)
-	// 	if err != nil {
-	// 		return FindResult{}, fmt.Errorf("failed to decode json: %w", err)
-	// 	}
-
-	// 	orders[i] = order
-	// }
-
-	// return FindResult{
-	// 	Orders: orders,
-	// 	Cursor: cursor,
-	// }, nil
+	return FindResult{}, nil
 }
