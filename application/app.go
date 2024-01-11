@@ -113,22 +113,22 @@ func initStore(a *App) (*sql.DB, error) {
 		return nil, err
 	}
 	if _, err := a.db.Exec(
-		`CREATE TABLE [IF NOT EXISTS] lineItem (
-			item_id INT PRIMARY KEY,
-			quantity INT,
-			price INT,
-			)`); err != nil {
+		`CREATE TABLE IF NOT EXISTS products (
+			product_no integer PRIMARY KEY,
+			quantity integer,
+			price integer
+		);`); err != nil {
 		return nil, err
 	}
 	if _, err := a.db.Exec(
-		`CREATE TABLE [IF NOT EXISTS] orders (
-			order_id INT PRIMARY KEY,
-			customer_id INT,
-			line_items INT[][] REFERENCES lineItem(item_id),
+		`CREATE TABLE IF NOT EXISTS orders_db (
+			order_id integer PRIMARY KEY,
+			customer_id integer,
+			product_no integer REFERENCES products (product_no),
 			CreatedAt TIMESTAMP,
 			ShippedAt TIMESTAMP,
 			CompletedAt TIMESTAMP
-			)`); err != nil {
+  		);`); err != nil {
 		return nil, err
 	}
 
