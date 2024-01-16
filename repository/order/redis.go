@@ -19,7 +19,7 @@ func (r *RedisRepo) Insert(ctx context.Context, order model.Order) error {
 	if err != nil {
 		return fmt.Errorf("failed to encode order: %w", err)
 	}
-
+	fmt.Println("data from redis repo--->")
 	key := orderIDKey(order.OrderID)
 
 	txn := r.Client.TxPipeline()

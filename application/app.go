@@ -15,7 +15,7 @@ import (
 type App struct {
 	router http.Handler
 	rdb    *redis.Client
-	db     *sql.DB
+	db     *sql.DB // Database connection pool.
 	config Config
 }
 
@@ -124,10 +124,10 @@ func initStore(a *App) (*sql.DB, error) {
 		`CREATE TABLE IF NOT EXISTS orders_db (
 			order_id integer PRIMARY KEY,
 			customer_id integer,
-			product_no integer REFERENCES products (product_no),
-			CreatedAt TIMESTAMP,
-			ShippedAt TIMESTAMP,
-			CompletedAt TIMESTAMP
+			products integer REFERENCES products,
+			created_at TIMESTAMP,
+			shipped_at TIMESTAMP,
+			completed_at TIMESTAMP
   		);`); err != nil {
 		return nil, err
 	}

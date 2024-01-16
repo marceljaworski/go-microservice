@@ -25,10 +25,14 @@ func (a *App) loadRoutes() {
 }
 
 func (a *App) loadOrderRoutes(router chi.Router) {
+
 	orderHandler := &handler.Order{
 		Repo: &order.RedisRepo{
 			Client: a.rdb,
 		},
+		// Repo: &order.PostgresRepo{
+		// 	DB: a.db,
+		// },
 	}
 
 	router.Post("/", orderHandler.Create)

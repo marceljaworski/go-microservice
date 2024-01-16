@@ -34,7 +34,16 @@ List of the available tables
 Show table orders_db
 `\d orders_db`
 
+Use CASCADE with DROP TABLE (and DROP SCHEMA)
+
+`DROP TABLE table_name CASCADE;`
+
 In this project, the user, db and tables have already been created. But there are these commands to do it:
 
 `CREATE USER postgres_user WITH PASSWORD 'password';`
 `CREATE DATABASE my_postgres_db OWNER postgres_user;`
+
+### test
+
+in terminal
+`curl -X POST -d '{"customer_id":"'$(uuidgen)'","products":{"product_no":'$(uuidgen)'","quantity":3,"price":999}}' localhost:3000/orders`

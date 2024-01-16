@@ -22,10 +22,10 @@ type Order struct {
 // Create an order
 func (h *Order) Create(w http.ResponseWriter, r *http.Request) {
 	var body struct {
-		CustomerID uuid.UUID        `json:"customer_id"`
-		LineItems  []model.LineItem `json:"line_items"`
+		CustomerID uuid.UUID      `json:"customer_id"`
+		Products   model.Products `json:"products"`
 	}
-
+	fmt.Println("request--->", json.NewDecoder(r.Body).Decode(&body))
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -36,7 +36,7 @@ func (h *Order) Create(w http.ResponseWriter, r *http.Request) {
 	order := model.Order{
 		OrderID:    rand.Uint64(),
 		CustomerID: body.CustomerID,
-		LineItems:  body.LineItems,
+		Products:   body.Products,
 		CreatedAt:  &now,
 	}
 
